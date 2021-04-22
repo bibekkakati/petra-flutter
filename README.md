@@ -17,7 +17,7 @@ Period Tracker app that predicts the next date of the menstruation phase and not
 -   BLoC Pattern
 -   SQLite
 
-### [Download APK](/petra.apk)
+### [Download APK](https://github.com/bibekkakati/petra-flutter/raw/main/petra.apk)
 
 ### Screenshots:
 
