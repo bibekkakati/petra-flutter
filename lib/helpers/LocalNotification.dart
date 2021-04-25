@@ -9,7 +9,7 @@ class LocalNotification {
   factory LocalNotification() {
     if (_localNotification == null) {
       _localNotification = LocalNotification._createInstance();
-      _localNotification._inititialize();
+      _localNotification._initialize();
     }
     return _localNotification;
   }
@@ -23,7 +23,7 @@ class LocalNotification {
     _localNotification.cancelNotification();
   }
 
-  Future<void> _inititialize() async {
+  Future<void> _initialize() async {
     AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@drawable/ic_notification');
     IOSInitializationSettings initializationSettingsIOS =

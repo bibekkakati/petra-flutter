@@ -21,4 +21,7 @@ Period Tracker app that predicts the next date of the menstruation phase and not
 
 ### Screenshots:
 
-![1](/mockups/1.jpeg) ![2](/mockups/2.jpeg)
+<p align="center">
+    <img width="260" src="/mockup/1.jpeg">
+    <img width="260" src="/mockup/2.jpeg">
+</p>
