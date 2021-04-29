@@ -51,8 +51,9 @@ class LocalNotification {
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
+    await cancelNotification();
     await _flutterLocalNotificationsPlugin.schedule(
-      DateTime.now().microsecond,
+      0,
       title,
       body,
       scheduledDate,

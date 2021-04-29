@@ -56,7 +56,7 @@ class _PredictPageState extends State<PredictPage> {
           lastPeriod.add(Duration(days: (cycleLength / 2).floor()));
       lutealPhase =
           lastPeriod.add(Duration(days: (cycleLength / 2).floor() + 2));
-      Result result = Result(null, null, cycleLength, lastPeriod, nextPeriod,
+      Result result = Result(null, cycleLength, lastPeriod, nextPeriod,
           follicularPhase, ovulationPhase, lutealPhase);
       this._navigateToResultPage(result);
     } else {

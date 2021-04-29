@@ -62,6 +62,12 @@ class DatabaseHelper {
     return result > 0 ? true : false;
   }
 
+  Future<bool> deleteAllCycles() async {
+    Database db = await this.database;
+    int result = await db.rawDelete('DELETE FROM $_ongoingTable');
+    return result > 0 ? true : false;
+  }
+
   Future<bool> deleteRecord(Result cycle) async {
     Database db = await this.database;
     int result = await db

@@ -2,24 +2,34 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:petra/helpers/DatabaseHelper.dart';
+import 'package:petra/helpers/LocalNotification.dart';
 import 'package:petra/models/Result.dart';
+import 'package:petra/screens/HomePage.dart';
 import 'package:petra/widgets/BottomModal.dart';
 import 'package:petra/widgets/Button.dart';
 import 'package:petra/widgets/MessageBar.dart';
-import 'package:petra/widgets/TrackCycle.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:uuid/uuid.dart';
 
 class ResultPage extends StatefulWidget {
   final Result result;
+  final bool completeOption;
 
-  ResultPage({Key key, @required this.result}) : super(key: key);
+  ResultPage({Key key, @required this.result, this.completeOption})
+      : super(key: key);
 
   @override
   _ResultPageState createState() => _ResultPageState();
 }
 
 class _ResultPageState extends State<ResultPage> {
+  Uuid uuid = Uuid();
+  DatabaseHelper _databaseHelper = DatabaseHelper();
+  LocalNotification _localNotification = LocalNotification();
+
   Result _result;
+  bool _completeOption;
 
   DateTime _todaysDate,
       _firstDay,
@@ -38,6 +48,45 @@ class _ResultPageState extends State<ResultPage> {
     'FP': "Follicular Phase",
     'LP': "Luteal Phase"
   };
+
+  void _refreshPage(Result r) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          result: r,
+        ),
+      ),
+    );
+  }
+
+  void _startCycle() {
+    DateTime lastPeriod,
+        nextPeriod,
+        follicularPhase,
+        ovulationPhase,
+        lutealPhase;
+    int cycleLength = this._result.cycleLength;
+    lastPeriod = new DateTime.now();
+    nextPeriod = lastPeriod.add(Duration(days: cycleLength));
+    follicularPhase = lastPeriod.add(Duration(days: 1));
+    ovulationPhase = lastPeriod.add(Duration(days: (cycleLength / 2).floor()));
+    lutealPhase = lastPeriod.add(Duration(days: (cycleLength / 2).floor() + 2));
+    Result result = Result(null, cycleLength, lastPeriod, nextPeriod,
+        follicularPhase, ovulationPhase, lutealPhase);
+    this._trackCycle(r: result);
+  }
+
+  void _cycleCompleted() async {
+    this._result.nextPeriod = new DateTime.now();
+    bool completed = await this._databaseHelper.moveCycle(this._result);
+    if (completed) {
+      this._localNotification.cancelNotification();
+      this._startCycle();
+    } else {
+      showMessageBar(context, "Oops! Something went wrong.", error: true);
+    }
+  }
 
   void _showTips() {
     if (this._currentPhase == 'FP') {
@@ -119,30 +168,31 @@ class _ResultPageState extends State<ResultPage> {
     });
   }
 
-  void _onTrackSuccess(dynamic value) {
-    if (value == true) {
+  void _trackCycle({Result r}) async {
+    Result result = r != null ? r : this._result;
+    result.id = uuid.v1();
+    await _databaseHelper.deleteAllCycles();
+    bool done = await _databaseHelper.insertCycle(result);
+    if (done == true) {
       setState(() {
         _allowTracking = false;
       });
-      showMessageBar(context, "Started tracking.", error: false);
-    } else if (value == false) {
+      showMessageBar(context, "Started tracking new cycle.", error: false);
+      this._localNotification.scheduleNotification(
+            "Hey, 🌸",
+            "Your period is near.",
+            result.nextPeriod,
+          );
+      if (r != null) this._refreshPage(r);
+    } else {
       showMessageBar(context, "Something went wrong.", error: true);
     }
-  }
-
-  void _trackCycle() {
-    showBottomModal(
-      context,
-      TrackCycle(
-        result: this._result,
-      ),
-      cb: this._onTrackSuccess,
-    );
   }
 
   @override
   void initState() {
     _result = widget.result;
+    _completeOption = widget.completeOption;
     _todaysDate = DateTime.now();
     _periodDay = min(_todaysDate.difference(_result.lastPeriod).inDays + 2,
         _result.cycleLength);
@@ -281,8 +331,22 @@ class _ResultPageState extends State<ResultPage> {
             child: PButton(
               text: "Track Cycle",
               onPressed: this._trackCycle,
-            ))
-        : Container();
+            ),
+          )
+        : Container(
+            child: this._completeOption == true
+                ? Container(
+                    margin: EdgeInsets.only(
+                      top: 10.0,
+                      bottom: 15.0,
+                    ),
+                    child: PButton(
+                      text: "Mark Complete",
+                      onPressed: this._cycleCompleted,
+                    ),
+                  )
+                : null,
+          );
 
     return Scaffold(
       appBar: AppBar(

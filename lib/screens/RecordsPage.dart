@@ -16,7 +16,7 @@ class RecordsPage extends StatefulWidget {
 
 class _RecordsPageState extends State<RecordsPage> {
   DatabaseHelper _databaseHelper = DatabaseHelper();
-  DateTime _todaysDate;
+
   bool _loading;
   List<Result> _recordCycles;
 
@@ -87,7 +87,6 @@ class _RecordsPageState extends State<RecordsPage> {
   void initState() {
     super.initState();
     this._loading = true;
-    this._todaysDate = DateTime.now();
     this._recordCycles = [];
     this._fetchRecordCycles();
   }
@@ -95,10 +94,6 @@ class _RecordsPageState extends State<RecordsPage> {
   @override
   Widget build(BuildContext context) {
     GestureDetector cycleCard(Result cycle) {
-      String periodDay = min(
-              this._todaysDate.difference(cycle.lastPeriod).inDays + 2,
-              cycle.cycleLength)
-          .toString();
       return GestureDetector(
         onTap: () => this._navigateToResultPage(cycle),
         onLongPress: () => this._confirmDelete(cycle),
@@ -116,38 +111,24 @@ class _RecordsPageState extends State<RecordsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '🌸 ' + cycle.title,
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).textTheme.bodyText1.color,
-                        ),
-                      ),
-                      Text(
-                        "Period Date: " +
-                            DateFormat.MMMMd().format(cycle.nextPeriod),
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).textTheme.bodyText1.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    child: Text(
-                      "Day " + periodDay,
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor.withOpacity(0.4),
-                        fontSize: 24.0,
-                      ),
+                  Text("🌸"),
+                  Text(
+                    "Period Date: " +
+                        DateFormat.MMMMd().format(cycle.nextPeriod),
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.bodyText1.color,
                     ),
                   ),
+                  GestureDetector(
+                    onTap: () => this._confirmDelete(cycle),
+                    child: Icon(
+                      Icons.delete_outline,
+                      size: 20.0,
+                      color: Colors.grey[300],
+                    ),
+                  )
                 ],
               ),
             ),
@@ -164,16 +145,8 @@ class _RecordsPageState extends State<RecordsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.hourglass_empty,
-                    color: Theme.of(context).textTheme.bodyText1.color,
-                    size: 28.0,
-                  ),
-                ),
                 Text(
-                  "You don't have any past cycle!",
+                  "You don't have any cycle record.",
                   style: Theme.of(context).textTheme.bodyText1,
                 )
               ],
