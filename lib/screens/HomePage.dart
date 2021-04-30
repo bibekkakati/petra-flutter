@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:petra/helpers/DatabaseHelper.dart';
 import 'package:petra/helpers/LocalNotification.dart';
+import 'package:petra/helpers/LocalStorage.dart';
 import 'package:petra/models/Result.dart';
 import 'package:petra/screens/InformationPage.dart';
+import 'package:petra/screens/NameInputPage.dart';
 import 'package:petra/screens/OngoingPage.dart';
 import 'package:petra/screens/PredictPage.dart';
 import 'package:petra/screens/RecordsPage.dart';
@@ -17,7 +19,10 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   DatabaseHelper _databaseHelper = DatabaseHelper();
   LocalNotification _localNotification = LocalNotification();
+  LocalStorage _localStorage = LocalStorage();
   Uuid uuid = Uuid();
+
+  bool _loading;
 
   void _navigateToPredict() {
     Navigator.push(
@@ -37,6 +42,11 @@ class _HomepageState extends State<Homepage> {
   void _navigateToInformation() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => InformationPage()));
+  }
+
+  void _navigateToNameInput() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => NameInputPage()));
   }
 
   void _startCycle(Result _result) {
@@ -60,9 +70,10 @@ class _HomepageState extends State<Homepage> {
     result.id = uuid.v1();
     bool done = await _databaseHelper.insertCycle(result);
     if (done == true) {
+      String name = await this._localStorage.get("name");
       this._localNotification.scheduleNotification(
-            "Hey, 🌸",
-            "Your period is near.",
+            "Hey, $name",
+            "Your period is near 🌸",
             result.nextPeriod,
           );
     }
@@ -78,9 +89,22 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  void _isFirstTime() async {
+    String name = await this._localStorage.get("name");
+    if (name == null) {
+      this._navigateToNameInput();
+    } else {
+      setState(() {
+        _loading = false;
+      });
+      this._syncRecords();
+    }
+  }
+
   @override
   void initState() {
-    this._syncRecords();
+    _loading = true;
+    this._isFirstTime();
     super.initState();
   }
 
@@ -107,31 +131,43 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/logo.jpg",
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width,
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 40),
-                  width: 200,
-                  height: 240,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: screenRoutes,
+        child: this._loading == true
+            ? Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).backgroundColor),
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              )
+            : SingleChildScrollView(
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/logo.jpg",
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width,
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 40),
+                        width: 200,
+                        height: 240,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: screenRoutes,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }

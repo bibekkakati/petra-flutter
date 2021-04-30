@@ -10,7 +10,6 @@ class DatabaseHelper {
   String _ongoingTable = "ongoingTable";
   String _recordsTable = "recordsTable";
   String _colId = "id";
-  String _colTitle = "title";
   String _colCycleLength = "cycleLength";
   String _colLastPeriod = "lastPeriod";
   String _colNextPeriod = "nextPeriod";
@@ -44,9 +43,9 @@ class DatabaseHelper {
 
   void _createTables(Database db, int newVersion) async {
     await db.execute(
-        "CREATE TABLE $_ongoingTable($_colId TEXT PRIMARY KEY, $_colTitle TEXT, $_colCycleLength INTEGER, $_colLastPeriod TEXT, $_colNextPeriod TEXT, $_colFollicularPhase TEXT, $_colOvulationPhase TEXT,  $_colLutealPhase TEXT )");
+        "CREATE TABLE $_ongoingTable($_colId TEXT PRIMARY KEY,  $_colCycleLength INTEGER, $_colLastPeriod TEXT, $_colNextPeriod TEXT, $_colFollicularPhase TEXT, $_colOvulationPhase TEXT,  $_colLutealPhase TEXT )");
     await db.execute(
-        "CREATE TABLE $_recordsTable($_colId TEXT PRIMARY KEY, $_colTitle TEXT, $_colCycleLength INTEGER, $_colLastPeriod TEXT, $_colNextPeriod TEXT, $_colFollicularPhase TEXT, $_colOvulationPhase TEXT,  $_colLutealPhase TEXT )");
+        "CREATE TABLE $_recordsTable($_colId TEXT PRIMARY KEY,  $_colCycleLength INTEGER, $_colLastPeriod TEXT, $_colNextPeriod TEXT, $_colFollicularPhase TEXT, $_colOvulationPhase TEXT,  $_colLutealPhase TEXT )");
   }
 
   Future<bool> insertCycle(Result cycle) async {

@@ -55,6 +55,13 @@ class MyApp extends StatelessWidget {
             fontSize: 22.0,
             letterSpacing: 0.3,
           ),
+          headline4: TextStyle(
+            color: Color(0xFF0D0C22),
+            fontWeight: FontWeight.w400,
+            fontSize: 16.0,
+            letterSpacing: 0.2,
+            height: 1.3,
+          ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(

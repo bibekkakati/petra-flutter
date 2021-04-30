@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:petra/helpers/DatabaseHelper.dart';
 import 'package:petra/helpers/LocalNotification.dart';
+import 'package:petra/helpers/LocalStorage.dart';
 import 'package:petra/models/Result.dart';
-import 'package:petra/screens/HomePage.dart';
 import 'package:petra/widgets/BottomModal.dart';
 import 'package:petra/widgets/Button.dart';
 import 'package:petra/widgets/MessageBar.dart';
@@ -27,6 +27,7 @@ class _ResultPageState extends State<ResultPage> {
   Uuid uuid = Uuid();
   DatabaseHelper _databaseHelper = DatabaseHelper();
   LocalNotification _localNotification = LocalNotification();
+  LocalStorage _localStorage = LocalStorage();
 
   Result _result;
   bool _completeOption;
@@ -96,7 +97,7 @@ class _ResultPageState extends State<ResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Text(
               "The focus of the diet should be on increasing iron-rich foods and vitamin B12. Some iron-rich foods include grass-fed beef or wild game, wild-caught fish such as salmon, and organic chicken. Additionally, including pasture-raised eggs during this period of the cycle can be very nourishing (always ensure pasture-raised variety for highest nutrient density).",
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ));
       return;
@@ -108,7 +109,7 @@ class _ResultPageState extends State<ResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Text(
               "Focus on fiber-rich veggies like asparagus, Brussels sprouts, chard, dandelion greens, okra, and spinach. Additionally, antioxidant-rich fruit such as raspberries, strawberries, coconut and guava help to increase glutathione and support further detoxification of rising hormones in the liver.",
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ));
       return;
@@ -120,7 +121,7 @@ class _ResultPageState extends State<ResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Text(
               "Focus on brown rice and millet as your grain choices in addition to protein from chickpeas, great northern beans, and navy beans or grass-fed beef and organic turkey. Lastly, sipping on peppermint tea at night or adding marine algae such as spirulina to smoothies can be great additions to help promote hormonal balance in this phase as well.",
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ));
       return;
@@ -132,7 +133,7 @@ class _ResultPageState extends State<ResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Text(
               "Foods that can help include water-rich fruits and vegetables that have an overall low glycemic index and are rich in iron, zinc, and iodine. Specifically, adzuki and kidney beans, kale, kelp, wakame, mushrooms, water chestnuts, beets, and watermelon can be very therapeutic.",
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ));
       return;
@@ -178,9 +179,10 @@ class _ResultPageState extends State<ResultPage> {
         _allowTracking = false;
       });
       showMessageBar(context, "Started tracking new cycle.", error: false);
+      String name = await this._localStorage.get("name");
       this._localNotification.scheduleNotification(
-            "Hey, 🌸",
-            "Your period is near.",
+            "Hey, $name",
+            "Your period is near 🌸",
             result.nextPeriod,
           );
       if (r != null) this._refreshPage(r);
@@ -361,7 +363,13 @@ class _ResultPageState extends State<ResultPage> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             child: this._loading == true
-                ? Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).backgroundColor),
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
+                  )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
