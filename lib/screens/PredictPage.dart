@@ -135,12 +135,11 @@ class _PredictPageState extends State<PredictPage> {
 
     Container datePicker() => Container(
           margin: EdgeInsets.only(
-            top: 0.0,
+            top: 15.0,
             bottom: 15.0,
             left: 15.0,
             right: 15.0,
           ),
-          height: 350.0,
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
@@ -191,17 +190,17 @@ class _PredictPageState extends State<PredictPage> {
         child: Container(
           margin: EdgeInsets.only(top: 5.0),
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height - 50,
+          height: MediaQuery.of(context).size.height,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               main(),
               cycleLengthPicker(),
               datePicker(),
               PButton(
-                text: "Submit",
                 onPressed: this._predictCycle,
+                text: "Submit",
               )
             ],
           ),
