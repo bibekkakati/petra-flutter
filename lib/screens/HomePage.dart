@@ -4,9 +4,10 @@ import 'package:petra/helpers/LocalNotification.dart';
 import 'package:petra/helpers/LocalStorage.dart';
 import 'package:petra/models/Result.dart';
 import 'package:petra/screens/InformationPage.dart';
-import 'package:petra/screens/NameInputPage.dart';
+import 'package:petra/screens/ProfileInputPage.dart';
 import 'package:petra/screens/OngoingPage.dart';
 import 'package:petra/screens/PredictPage.dart';
+import 'package:petra/screens/ProfilePage.dart';
 import 'package:petra/screens/RecordsPage.dart';
 import 'package:petra/widgets/Button.dart';
 import 'package:uuid/uuid.dart';
@@ -46,7 +47,12 @@ class _HomepageState extends State<Homepage> {
 
   void _navigateToNameInput() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => NameInputPage()));
+        context, MaterialPageRoute(builder: (context) => ProfileInputPage()));
+  }
+
+  void _navigateToProfile() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ProfilePage()));
   }
 
   void _startCycle(Result _result) {
@@ -122,6 +128,10 @@ class _HomepageState extends State<Homepage> {
       PButton(
         text: "Records",
         onPressed: _navigateToRecords,
+      ),
+      OButton(
+        text: "Profile",
+        onPressed: _navigateToProfile,
       ),
       OButton(
         text: "Information",
